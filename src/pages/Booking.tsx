@@ -2,14 +2,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
-import { MapPin } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { MapPin, X } from "lucide-react";
 import BookingForm from "@/components/BookingForm";
 import { getLoungeById } from "@/lib/data";
 import { api } from "@/lib/api";
 import { adaptLounges } from "@/lib/apiAdapter";
 import { toast } from "sonner";
 import { Lounge } from "@/lib/data";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerDescription,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   guests: z.number(),
@@ -19,11 +27,16 @@ const formSchema = z.object({
 
 type BookingFormData = z.infer<typeof formSchema>;
 
-const Booking = () => {
+interface BookingProps {
+  onClose: () => void;
+}
+
+const Booking = ({ onClose }: BookingProps) => {
   const { loungeId } = useParams();
   const navigate = useNavigate();
   const [lounge, setLounge] = useState<Lounge | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
   
   useEffect(() => {
     const fetchLoungeDetails = async () => {
@@ -32,7 +45,7 @@ const Booking = () => {
       if (!loungeId) {
         console.error("Booking - No loungeId provided");
         toast.error("Lounge information not found");
-        navigate("/airport-select");
+        handleClose();
         return;
       }
 
@@ -81,11 +94,11 @@ const Booking = () => {
         // If we reach here, no lounge was found
         console.error("Booking - Lounge not found with ID:", loungeId);
         toast.error("Lounge information not found");
-        navigate("/airport-select");
+        handleClose();
       } catch (err) {
         console.error("Booking - Failed to fetch lounge:", err);
         toast.error("Failed to load lounge information");
-        navigate("/airport-select");
+        handleClose();
       } finally {
         setLoading(false);
       }
@@ -124,73 +137,77 @@ const Booking = () => {
     console.log("Booking - Saving booking details:", bookingDetails);
     sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
     
-    // Navigate to the checkout page as an overlay
-    navigate("/checkout");
+    // Close current drawer before navigating
+    setIsOpen(false);
+    
+    // Navigate to the checkout page with a slight delay for animation
+    setTimeout(() => {
+      navigate("/checkout");
+    }, 300);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar title="Loading..." showBackButton />
-        <div className="page-container">
-          <div className="page-content flex items-center justify-center h-[80vh]">
-            <div className="text-center">
-              <p className="text-muted-foreground">Loading lounge information...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleClose = () => {
+    setIsOpen(false);
+    // Add a slight delay to allow drawer close animation
+    setTimeout(onClose, 300);
+  };
 
-  if (!lounge) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar title="Error" showBackButton />
-        <div className="page-container">
-          <div className="page-content flex items-center justify-center h-[80vh]">
-            <div className="text-center">
-              <p className="text-destructive">Lounge information not found</p>
-              <button 
-                className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
-                onClick={() => navigate("/airport-select")}
-              >
-                Return to Airport Selection
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (!lounge && !loading) {
+    return null;
   }
 
   return (
-    <div className="page-container bg-background">
-      <Navbar title="Book Lounge Access" showBackButton />
-      
-      <div className="page-content">
-        <div className="mb-6">
-          <h1 className="page-heading">Booking Details</h1>
-          <p className="text-muted-foreground">
-            Select number of guests
-          </p>
-        </div>
-        
-        <div className="p-5 rounded-xl bg-white border shadow-sm mb-6">
-          <div className="flex items-start">
-            <div className="flex-1">
-              <h2 className="font-semibold">{lounge?.name}</h2>
-              <div className="flex items-center mt-1 text-sm text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5 mr-1" /> 
-                <span>{lounge?.terminal}</span>
+    <Drawer 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
+      <DrawerContent className="h-[90vh] max-h-[90vh]">
+        <div className="max-w-md mx-auto h-full flex flex-col overflow-hidden">
+          <DrawerHeader className="border-b">
+            <DrawerTitle className="flex items-center justify-between">
+              <span>Book Lounge Access</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={handleClose}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Book your lounge access
+            </DrawerDescription>
+          </DrawerHeader>
+          
+          <div className="flex-1 overflow-y-auto px-4 py-6">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Loading lounge information...</p>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="p-5 rounded-xl bg-white border shadow-sm mb-6">
+                  <div className="flex items-start">
+                    <div className="flex-1">
+                      <h2 className="font-semibold">{lounge?.name}</h2>
+                      <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5 mr-1" /> 
+                        <span>{lounge?.terminal}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {lounge && <BookingForm lounge={lounge} onSubmit={handleSubmit} />}
+              </>
+            )}
           </div>
         </div>
-        
-        {lounge && <BookingForm lounge={lounge} onSubmit={handleSubmit} />}
-      </div>
-    </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

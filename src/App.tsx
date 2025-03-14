@@ -16,23 +16,25 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Wrapper component to manage checkout visibility
+// Wrapper component to manage overlay visibility
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
   const [prevLocation, setPrevLocation] = useState(location);
 
-  // Keep track of the previous location before /checkout
+  // Keep track of the previous location before overlay routes
   useEffect(() => {
-    if (!location.pathname.includes('/checkout')) {
+    if (!location.pathname.includes('/checkout') && !location.pathname.includes('/booking/')) {
       setPrevLocation(location);
     }
   }, [location]);
 
-  // Show checkout when on checkout route
+  // Show overlays when on respective routes
   useEffect(() => {
     setShowCheckout(location.pathname.includes('/checkout'));
+    setShowBooking(location.pathname.includes('/booking/'));
   }, [location]);
 
   const handleCloseCheckout = () => {
@@ -41,9 +43,15 @@ const AppRoutes = () => {
     navigate(-1);
   };
 
+  const handleCloseBooking = () => {
+    setShowBooking(false);
+    // Navigate back to previous page
+    navigate(-1);
+  };
+
   // This is the location we'll render in the main Routes
-  // When in checkout, we still want to render the previous location underneath
-  const backgroundLocation = showCheckout ? prevLocation : location;
+  // When in overlay, we still want to render the previous location underneath
+  const backgroundLocation = (showCheckout || showBooking) ? prevLocation : location;
 
   return (
     <>
@@ -52,12 +60,18 @@ const AppRoutes = () => {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/airport-select" element={<AirportSelect />} />
         <Route path="/lounges/:airportId" element={<LoungeDetails />} />
-        <Route path="/booking/:loungeId" element={<Booking />} />
         <Route path="/confirmation" element={<Confirmation />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Show checkout as an overlay when on the /checkout route */}
+      {/* Show booking as an overlay */}
+      {showBooking && (
+        <Routes>
+          <Route path="/booking/:loungeId" element={<Booking onClose={handleCloseBooking} />} />
+        </Routes>
+      )}
+      
+      {/* Show checkout as an overlay */}
       {showCheckout && (
         <Routes>
           <Route path="/checkout" element={<Checkout onClose={handleCloseCheckout} />} />

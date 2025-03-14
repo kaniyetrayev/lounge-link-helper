@@ -133,7 +133,7 @@ const LoungeDetails = () => {
     // Store the selected lounge in session storage for backup retrieval
     sessionStorage.setItem("selectedLounge", JSON.stringify(lounge));
     
-    // Navigate to the booking page with the lounge ID
+    // Navigate to the booking page as an overlay
     navigate(`/booking/${lounge.id}`);
   };
 
