@@ -124,8 +124,8 @@ const Checkout = ({ onClose }: CheckoutProps) => {
       }}
     >
       <DrawerContent>
-        <div className="max-w-md mx-auto">
-          <DrawerHeader className="border-b">
+        <div className="max-w-md mx-auto page-content">
+          <DrawerHeader className="border-b px-0">
             <DrawerTitle className="flex items-center justify-between">
               <span>Checkout</span>
               <Button
@@ -142,7 +142,7 @@ const Checkout = ({ onClose }: CheckoutProps) => {
             </DrawerDescription>
           </DrawerHeader>
           
-          <div className="px-4 py-6">
+          <div className="py-6">
             <div className="space-y-6">
               <div>
                 <h3 className="font-medium text-lg">{bookingDetails.loungeName}</h3>
@@ -185,7 +185,7 @@ const Checkout = ({ onClose }: CheckoutProps) => {
             </div>
           </div>
           
-          <DrawerFooter className="border-t pt-4">
+          <DrawerFooter className="border-t pt-4 px-0">
             <Button 
               className="w-full" 
               size="lg"

@@ -154,8 +154,8 @@ const Booking = ({ onClose }: BookingProps) => {
       }}
     >
       <DrawerContent className="h-[90vh] max-h-[90vh]">
-        <div className="max-w-md mx-auto h-full flex flex-col overflow-hidden">
-          <DrawerHeader className="border-b">
+        <div className="max-w-md mx-auto h-full flex flex-col overflow-hidden page-content">
+          <DrawerHeader className="border-b px-0">
             <DrawerTitle className="flex items-center justify-between">
               <span>Book Lounge Access</span>
               <Button
@@ -172,7 +172,7 @@ const Booking = ({ onClose }: BookingProps) => {
             </DrawerDescription>
           </DrawerHeader>
           
-          <div className="flex-1 overflow-y-auto px-4 py-6">
+          <div className="flex-1 overflow-y-auto py-6">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-muted-foreground">Loading lounge information...</p>
