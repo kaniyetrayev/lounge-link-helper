@@ -13,7 +13,6 @@ const LoungeCard = ({ lounge, onClick }: LoungeCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   
   const handleClick = () => {
-    // Log the complete lounge object for debugging
     console.log("LoungeCard - Lounge selected:", lounge);
     onClick();
   };

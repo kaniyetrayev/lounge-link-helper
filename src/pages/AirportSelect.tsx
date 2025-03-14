@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Ticket } from "lucide-react";
@@ -5,7 +6,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import AirportSearch from "@/components/AirportSearch";
 import { Airport } from "@/lib/data";
-import { fadeIn, slideUp, staggeredChildren } from "@/lib/animations";
+import { slideUp, staggeredChildren } from "@/lib/animations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -62,10 +63,9 @@ const AirportSelect = () => {
   }, []);
 
   const handleAirportSelect = (airport: Airport) => {
-    // Store selected airport in session storage to ensure it's available in LoungeDetails
+    // Store selected airport in session storage
     sessionStorage.setItem("selectedAirport", JSON.stringify(airport));
     
-    // Log for debugging
     console.log("AirportSelect - Airport selected:", airport);
     console.log("AirportSelect - Navigating to:", `/lounges/${airport.id}`);
     

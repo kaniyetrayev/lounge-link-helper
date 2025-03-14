@@ -1,10 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Clock, Star, ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import { getAirportById, formatCurrency } from "@/lib/data";
+import { getAirportById } from "@/lib/data";
 import { api } from "@/lib/api";
 import { adaptLounges } from "@/lib/apiAdapter";
 import { Lounge, Airport } from "@/lib/data";

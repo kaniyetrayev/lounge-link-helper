@@ -38,7 +38,6 @@ const Confirmation = () => {
 
   const handleFindMoreLounges = () => {
     // Redirect to airport selection without clearing completedBooking
-    // This allows the unused booking to be visible
     sessionStorage.removeItem("bookingDetails");
     navigate("/airport-select");
   };

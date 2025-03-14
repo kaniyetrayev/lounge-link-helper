@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,7 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
 import { Lounge, formatCurrency } from "@/lib/data";
 
 const formSchema = z.object({
@@ -35,7 +33,6 @@ const BookingForm = ({ lounge, onSubmit }: BookingFormProps) => {
   });
 
   const guests = form.watch("guests") || 1;
-  
   const totalPrice = lounge.price * guests;
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
