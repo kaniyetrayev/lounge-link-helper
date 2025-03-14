@@ -23,7 +23,11 @@ const Navbar = ({
   const location = useLocation();
 
   const handleBack = () => {
-    if (location.pathname === "/airport-select") {
+    // Check if we're on a lounge details page
+    if (location.pathname.startsWith('/lounges/')) {
+      // Navigate to airport selection page when back is pressed from lounges page
+      navigate("/airport-select");
+    } else if (location.pathname === "/airport-select") {
       navigate("/");
     } else {
       navigate(-1);
