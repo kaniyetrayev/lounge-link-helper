@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { adaptLounges } from "@/lib/apiAdapter";
 import { toast } from "sonner";
 import { Lounge } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Drawer,
   DrawerContent,
@@ -35,6 +36,9 @@ const Booking = ({ onClose }: BookingProps) => {
   const [lounge, setLounge] = useState<Lounge | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [checkoutMode, setCheckoutMode] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   useEffect(() => {
     const fetchLoungeDetails = async () => {
@@ -113,8 +117,8 @@ const Booking = ({ onClose }: BookingProps) => {
       return;
     }
     
-    // Store the booking details in session storage
-    const bookingDetails = {
+    // Store the booking details in state
+    const details = {
       loungeId: lounge.id,
       loungeName: lounge.name,
       terminal: lounge.terminal,
@@ -124,16 +128,81 @@ const Booking = ({ onClose }: BookingProps) => {
       currency: lounge.currency,
     };
     
-    console.log("Booking - Saving booking details:", bookingDetails);
-    sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+    console.log("Booking - Saving booking details:", details);
+    setBookingDetails(details);
+    sessionStorage.setItem("bookingDetails", JSON.stringify(details));
     
-    // Close current drawer before navigating
+    // Switch to checkout mode
+    setCheckoutMode(true);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      setIsProcessing(true);
+      
+      // Generate booking reference ID
+      const bookingId = `LNG-${Math.floor(Math.random() * 10000)}`;
+      
+      // Prepare the booking data
+      const bookingData = {
+        lounge_id: bookingDetails.loungeId,
+        lounge_name: bookingDetails.loungeName,
+        terminal: bookingDetails.terminal,
+        guests: bookingDetails.guests,
+        total_price: bookingDetails.totalPrice,
+        currency: bookingDetails.currency,
+        // Add dummy customer data for the demo
+        first_name: "John",
+        last_name: "Doe",
+        email: "john.doe@example.com",
+        phone: "+1 123-456-7890",
+        booking_id: bookingId,
+        status: "confirmed"
+      };
+      
+      // Save to Supabase
+      const { error } = await supabase
+        .from('bookings')
+        .insert(bookingData);
+        
+      if (error) {
+        console.error("Failed to save booking:", error);
+        toast.error("Failed to complete booking, please try again");
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Store the completed booking for the confirmation page
+      const completedBooking = {
+        ...bookingDetails,
+        bookingId,
+        status: "confirmed",
+        firstName: bookingData.first_name,
+        lastName: bookingData.last_name,
+        email: bookingData.email,
+        phone: bookingData.phone
+      };
+      
+      sessionStorage.setItem("completedBooking", JSON.stringify(completedBooking));
+      
+      // Close drawer first to avoid animation issues
+      setIsOpen(false);
+      
+      // Then navigate to confirmation page after a short delay
+      setTimeout(() => {
+        navigate("/confirmation", { state: { fromCheckout: true, bookingId } });
+      }, 300);
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      toast.error("Checkout failed, please try again");
+      setIsProcessing(false);
+    }
+  };
+
+  const handleContinueBrowsing = () => {
     setIsOpen(false);
-    
-    // Navigate to the checkout page with a slight delay for animation
-    setTimeout(() => {
-      navigate("/checkout");
-    }, 300);
+    // Add a slight delay to allow drawer close animation
+    setTimeout(onClose, 300);
   };
 
   const handleClose = () => {
@@ -142,7 +211,11 @@ const Booking = ({ onClose }: BookingProps) => {
     setTimeout(onClose, 300);
   };
 
-  if (!lounge && !loading) {
+  const handleBackToBooking = () => {
+    setCheckoutMode(false);
+  };
+
+  if (!lounge && !loading && !checkoutMode) {
     return null;
   }
 
@@ -157,7 +230,7 @@ const Booking = ({ onClose }: BookingProps) => {
         <div className="max-w-md mx-auto h-full flex flex-col overflow-hidden page-content">
           <DrawerHeader className="border-b px-0">
             <DrawerTitle className="flex items-center justify-between">
-              <span>Book Lounge Access</span>
+              <span>{checkoutMode ? "Checkout" : "Book Lounge Access"}</span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -168,7 +241,7 @@ const Booking = ({ onClose }: BookingProps) => {
               </Button>
             </DrawerTitle>
             <DrawerDescription className="sr-only">
-              Book your lounge access
+              {checkoutMode ? "Complete your booking" : "Book your lounge access"}
             </DrawerDescription>
           </DrawerHeader>
           
@@ -177,7 +250,50 @@ const Booking = ({ onClose }: BookingProps) => {
               <div className="flex items-center justify-center h-full">
                 <p className="text-muted-foreground">Loading lounge information...</p>
               </div>
+            ) : checkoutMode ? (
+              // Checkout view
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-medium text-lg">{bookingDetails.loungeName}</h3>
+                  <p className="text-muted-foreground text-sm">{bookingDetails.terminal}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  {bookingDetails.formattedDate && (
+                    <div className="flex justify-between text-sm">
+                      <span>Date</span>
+                      <span className="font-medium">{bookingDetails.formattedDate}</span>
+                    </div>
+                  )}
+                  {bookingDetails.time && (
+                    <div className="flex justify-between text-sm">
+                      <span>Time</span>
+                      <span className="font-medium">{bookingDetails.time}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span>Guests</span>
+                    <span className="font-medium">{bookingDetails.guests}</span>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Price per guest</span>
+                    <span>
+                      {bookingDetails.currency} {bookingDetails.pricePerGuest}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mt-2 text-lg font-semibold">
+                    <span>Total</span>
+                    <span>
+                      {bookingDetails.currency} {bookingDetails.totalPrice}
+                    </span>
+                  </div>
+                </div>
+              </div>
             ) : (
+              // Booking view
               <>
                 <div className="p-5 rounded-xl bg-white border shadow-sm mb-6">
                   <div className="flex items-start">
@@ -195,6 +311,37 @@ const Booking = ({ onClose }: BookingProps) => {
               </>
             )}
           </div>
+
+          {checkoutMode && (
+            <DrawerFooter className="border-t pt-4 px-0">
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={handleCheckout}
+                disabled={isProcessing}
+              >
+                {isProcessing ? "Processing..." : "Complete Booking"}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                size="lg"
+                onClick={handleBackToBooking}
+                disabled={isProcessing}
+              >
+                Back to Details
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                size="lg"
+                onClick={handleContinueBrowsing}
+                disabled={isProcessing}
+              >
+                Continue Browsing
+              </Button>
+            </DrawerFooter>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

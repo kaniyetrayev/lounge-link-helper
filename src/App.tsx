@@ -10,7 +10,6 @@ import Onboarding from "./pages/Onboarding";
 import AirportSelect from "./pages/AirportSelect";
 import LoungeDetails from "./pages/LoungeDetails";
 import Booking from "./pages/Booking";
-import Checkout from "./pages/Checkout";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 
@@ -20,28 +19,20 @@ const queryClient = new QueryClient();
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [prevLocation, setPrevLocation] = useState(location);
 
   // Keep track of the previous location before overlay routes
   useEffect(() => {
-    if (!location.pathname.includes('/checkout') && !location.pathname.includes('/booking/')) {
+    if (!location.pathname.includes('/booking/')) {
       setPrevLocation(location);
     }
   }, [location]);
 
-  // Show overlays when on respective routes
+  // Show booking overlay when on booking route
   useEffect(() => {
-    setShowCheckout(location.pathname.includes('/checkout'));
     setShowBooking(location.pathname.includes('/booking/'));
   }, [location]);
-
-  const handleCloseCheckout = () => {
-    setShowCheckout(false);
-    // Navigate back to previous page
-    navigate(-1);
-  };
 
   const handleCloseBooking = () => {
     setShowBooking(false);
@@ -51,7 +42,7 @@ const AppRoutes = () => {
 
   // This is the location we'll render in the main Routes
   // When in overlay, we still want to render the previous location underneath
-  const backgroundLocation = (showCheckout || showBooking) ? prevLocation : location;
+  const backgroundLocation = showBooking ? prevLocation : location;
 
   return (
     <>
@@ -68,13 +59,6 @@ const AppRoutes = () => {
       {showBooking && (
         <Routes>
           <Route path="/booking/:loungeId" element={<Booking onClose={handleCloseBooking} />} />
-        </Routes>
-      )}
-      
-      {/* Show checkout as an overlay */}
-      {showCheckout && (
-        <Routes>
-          <Route path="/checkout" element={<Checkout onClose={handleCloseCheckout} />} />
         </Routes>
       )}
     </>
