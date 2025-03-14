@@ -13,13 +13,14 @@ const LoungeCard = ({ lounge, onClick }: LoungeCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   
   const handleClick = () => {
-    console.log("LoungeCard - Lounge selected:", lounge.id, lounge.name);
+    // Log the complete lounge object for debugging
+    console.log("LoungeCard - Lounge selected:", lounge);
     onClick();
   };
 
   return (
     <div 
-      className="w-full bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-200 active:scale-98 animate-slide-up"
+      className="w-full bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-200 active:scale-98 animate-slide-up cursor-pointer"
       onClick={handleClick}
     >
       <div className="aspect-[16/9] relative overflow-hidden bg-muted">
