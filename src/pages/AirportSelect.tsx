@@ -12,6 +12,22 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { adaptAirports } from "@/lib/apiAdapter";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Airport skeleton loading component
+const AirportItemSkeleton = () => (
+  <div className="w-full flex items-start space-x-3 p-4 bg-white rounded-xl shadow-sm border">
+    <Skeleton className="h-5 w-5 mt-0.5 rounded-full" />
+    <div className="w-full">
+      <div className="flex items-center mb-1">
+        <Skeleton className="h-5 w-28 mr-2" />
+        <Skeleton className="h-5 w-12 rounded-full" />
+      </div>
+      <Skeleton className="h-4 w-3/4 mb-1" />
+      <Skeleton className="h-3 w-1/3" />
+    </div>
+  </div>
+);
 
 const AirportSelect = () => {
   const navigate = useNavigate();
@@ -122,10 +138,7 @@ const AirportSelect = () => {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map(i => (
-                <div 
-                  key={i}
-                  className="w-full h-24 bg-accent/50 animate-pulse rounded-xl"
-                />
+                <AirportItemSkeleton key={i} />
               ))}
             </div>
           ) : error ? (

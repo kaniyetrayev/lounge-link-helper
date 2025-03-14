@@ -8,7 +8,8 @@ import { api } from "@/lib/api";
 import { adaptLounges } from "@/lib/apiAdapter";
 import { Lounge, Airport } from "@/lib/data";
 import { toast } from "sonner";
-import LoungeCard from "@/components/LoungeCard";
+import LoungeCard, { LoungeCardSkeleton } from "@/components/LoungeCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LoungeDetails = () => {
   const { airportId } = useParams();
@@ -146,10 +147,19 @@ const LoungeDetails = () => {
       <div className="page-container">
         <div className="page-content">
           <div className="mb-6">
-            <h1 className="page-heading">{airport.name}</h1>
-            <p className="text-muted-foreground">
-              {airport.city} Airport ({airport.code})
-            </p>
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-3/4 mb-2" />
+                <Skeleton className="h-5 w-1/2" />
+              </>
+            ) : (
+              <>
+                <h1 className="page-heading">{airport?.name}</h1>
+                <p className="text-muted-foreground">
+                  {airport?.city} Airport ({airport?.code})
+                </p>
+              </>
+            )}
           </div>
           
           <div className="mb-6">
@@ -159,10 +169,7 @@ const LoungeDetails = () => {
           {loading ? (
             <div className="space-y-6">
               {[1, 2, 3].map(i => (
-                <div 
-                  key={i}
-                  className="w-full h-64 bg-accent/50 animate-pulse rounded-xl"
-                />
+                <LoungeCardSkeleton key={i} />
               ))}
             </div>
           ) : error ? (

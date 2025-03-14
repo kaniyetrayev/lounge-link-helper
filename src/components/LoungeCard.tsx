@@ -3,11 +3,51 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Lounge, formatCurrency } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface LoungeCardProps {
   lounge: Lounge;
   onClick: () => void;
 }
+
+export const LoungeCardSkeleton = () => {
+  return (
+    <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="aspect-[16/9] relative">
+        <Skeleton className="w-full h-full" />
+      </div>
+      
+      <div className="p-4">
+        <div className="flex justify-between">
+          <div>
+            <Skeleton className="w-40 h-6 mb-2" />
+            <div className="flex items-center space-x-1">
+              <Skeleton className="w-20 h-4" />
+            </div>
+          </div>
+          
+          <div className="text-right">
+            <Skeleton className="w-20 h-6 mb-1" />
+            <Skeleton className="w-16 h-3 ml-auto" />
+          </div>
+        </div>
+        
+        <div className="mt-3">
+          <div className="flex flex-wrap gap-1">
+            <Skeleton className="w-16 h-5 rounded-full" />
+            <Skeleton className="w-20 h-5 rounded-full" />
+            <Skeleton className="w-14 h-5 rounded-full" />
+          </div>
+        </div>
+        
+        <div className="mt-4 flex justify-between items-center border-t pt-3">
+          <Skeleton className="w-28 h-4" />
+          <Skeleton className="w-24 h-5" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LoungeCard = ({ lounge, onClick }: LoungeCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
