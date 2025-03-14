@@ -1,23 +1,39 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import { MapPin, Ticket } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import AirportSearch from "@/components/AirportSearch";
 import { Airport, airports } from "@/lib/data";
 import { fadeIn, slideUp, staggeredChildren } from "@/lib/animations";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const AirportSelect = () => {
   const navigate = useNavigate();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [unusedBooking, setUnusedBooking] = useState<any>(null);
 
   // Popular cities to feature
   const popularAirports = airports.slice(0, 5);
 
+  useEffect(() => {
+    // Get completed booking from session storage
+    const bookingStr = sessionStorage.getItem("completedBooking");
+    
+    if (bookingStr) {
+      setUnusedBooking(JSON.parse(bookingStr));
+    }
+  }, []);
+
   const handleAirportSelect = (airport: Airport) => {
     // Navigate to the lounges page for the selected airport
     navigate(`/lounges/${airport.id}`);
+  };
+
+  const viewBooking = () => {
+    navigate("/confirmation");
   };
 
   return (
@@ -30,7 +46,36 @@ const AirportSelect = () => {
           <AirportSearch onSelect={handleAirportSelect} />
         </div>
 
-        <div className="mt-10">
+        {unusedBooking && (
+          <div className="w-full mb-8">
+            <Card className="border shadow-sm overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Unused Booking</CardTitle>
+                <CardDescription>You have an active lounge booking</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-medium">{unusedBooking.loungeName}</h3>
+                    <p className="text-sm text-muted-foreground">{unusedBooking.terminal}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Ticket className="h-5 w-5 text-primary" />
+                  </div>
+                </div>
+                <Button 
+                  variant="default" 
+                  className="w-full" 
+                  onClick={viewBooking}
+                >
+                  View Booking
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        <div className="mt-6">
           <h2 className="text-lg font-medium mb-4">Popular Airports</h2>
           
           <motion.div 
