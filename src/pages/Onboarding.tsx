@@ -67,19 +67,24 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      <AnimatePresence mode="wait">
-        {slides.map((slide, index) => (
-          <OnboardingSlide
-            key={index}
-            title={slide.title}
-            description={slide.description}
-            image={slide.image}
-            isActive={currentSlide === index}
-          />
-        ))}
-      </AnimatePresence>
+      {/* Show only the active slide without AnimatePresence to fix transition issues */}
+      {slides.map((slide, index) => (
+        <OnboardingSlide
+          key={index}
+          title={slide.title}
+          description={slide.description}
+          image={slide.image}
+          isActive={currentSlide === index}
+        >
+          {index === slides.length - 1 && (
+            <Button onClick={startApp} className="w-full">
+              Get Started
+            </Button>
+          )}
+        </OnboardingSlide>
+      ))}
 
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/95 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/95 to-transparent z-20">
         {renderDots()}
         
         <div className="flex space-x-4 mt-6">

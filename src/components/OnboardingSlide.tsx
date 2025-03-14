@@ -19,18 +19,14 @@ const OnboardingSlide = ({
   children
 }: OnboardingSlideProps) => {
   return (
-    <motion.div 
+    <div 
       className={cn(
         "absolute inset-0 flex flex-col items-center px-6 pb-24 pt-16",
-        isActive ? "z-10" : "z-0 pointer-events-none"
+        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
       )}
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ 
-        opacity: isActive ? 1 : 0,
-        x: isActive ? 0 : 100,
-        transition: { duration: 0.3 }
+      style={{
+        transition: "opacity 300ms ease-in-out",
       }}
-      exit={{ opacity: 0, x: -100 }}
     >
       <div className="h-[45vh] w-full relative mb-8 overflow-hidden rounded-2xl">
         <img 
@@ -47,7 +43,7 @@ const OnboardingSlide = ({
         <p className="text-muted-foreground mb-8">{description}</p>
         {children}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
