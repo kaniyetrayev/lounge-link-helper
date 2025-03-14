@@ -140,17 +140,20 @@ const LoungeDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar 
-        title={airport.name}
         showBackButton
       />
       
       <div className="page-container">
         <div className="page-content">
           <div className="mb-6">
-            <h1 className="page-heading">Available Lounges</h1>
+            <h1 className="page-heading">{airport.name}</h1>
             <p className="text-muted-foreground">
-              Select a lounge at {airport.city} Airport ({airport.code})
+              {airport.city} Airport ({airport.code})
             </p>
+          </div>
+          
+          <div className="mb-6">
+            <h2 className="text-xl font-medium">Available Lounges</h2>
           </div>
           
           {loading ? (
