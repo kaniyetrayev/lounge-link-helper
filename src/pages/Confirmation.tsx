@@ -127,7 +127,7 @@ const Confirmation = () => {
     <div className="page-container bg-background">
       <Navbar title="Booking Confirmed" />
       
-      <div className="max-w-md mx-auto w-full px-4 pt-4 pb-32">
+      <div className="page-content">
         <div className="mb-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="h-8 w-8 text-green-600" />
@@ -189,21 +189,23 @@ const Confirmation = () => {
           </div>
         </div>
         
-        <Button
-          variant="outline"
-          className="w-full h-12 mb-4"
-          onClick={() => window.print()}
-        >
-          Download Pass
-        </Button>
-        
-        <Button
-          variant="default"
-          className="w-full h-12"
-          onClick={handleFindMoreLounges}
-        >
-          Find More Lounges
-        </Button>
+        <div className="space-y-4">
+          <Button
+            variant="outline"
+            className="w-full h-12"
+            onClick={() => window.print()}
+          >
+            Download Pass
+          </Button>
+          
+          <Button
+            variant="default"
+            className="w-full h-12"
+            onClick={handleFindMoreLounges}
+          >
+            Find More Lounges
+          </Button>
+        </div>
       </div>
     </div>
   );
