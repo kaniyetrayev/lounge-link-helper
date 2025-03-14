@@ -17,7 +17,12 @@ const Confirmation = () => {
     const bookingStr = sessionStorage.getItem("completedBooking");
     
     if (bookingStr) {
-      setBooking(JSON.parse(bookingStr));
+      const bookingData = JSON.parse(bookingStr);
+      setBooking(bookingData);
+      
+      // Store in session storage for future reference
+      sessionStorage.setItem("completedBooking", JSON.stringify(bookingData));
+      
       // Show success toast
       toast.success("Booking confirmed!", {
         description: "Your lounge access has been successfully booked!"
@@ -32,11 +37,9 @@ const Confirmation = () => {
   }
 
   const handleFindMoreLounges = () => {
-    // Clear session storage
+    // Redirect to airport selection without clearing completedBooking
+    // This allows the unused booking to be visible
     sessionStorage.removeItem("bookingDetails");
-    sessionStorage.removeItem("completedBooking");
-    
-    // Redirect to airport selection
     navigate("/airport-select");
   };
   

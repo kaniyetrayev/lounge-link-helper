@@ -9,10 +9,10 @@ import { Airport, airports } from "@/lib/data";
 import { fadeIn, slideUp, staggeredChildren } from "@/lib/animations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const AirportSelect = () => {
   const navigate = useNavigate();
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [unusedBooking, setUnusedBooking] = useState<any>(null);
 
   // Popular cities to feature
@@ -23,7 +23,13 @@ const AirportSelect = () => {
     const bookingStr = sessionStorage.getItem("completedBooking");
     
     if (bookingStr) {
-      setUnusedBooking(JSON.parse(bookingStr));
+      const booking = JSON.parse(bookingStr);
+      setUnusedBooking(booking);
+      
+      // Show toast to indicate there's an unused booking
+      toast.info("You have an active booking", {
+        description: "Your lounge booking is ready to use",
+      });
     }
   }, []);
 
@@ -50,8 +56,8 @@ const AirportSelect = () => {
           <div className="w-full mb-8">
             <Card className="border shadow-sm overflow-hidden">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Unused Booking</CardTitle>
-                <CardDescription>You have an active lounge booking</CardDescription>
+                <CardTitle className="text-lg">Active Booking</CardTitle>
+                <CardDescription>You have an unused lounge booking</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between mb-3">
