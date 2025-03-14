@@ -12,6 +12,7 @@ export interface Lounge {
   airportId: string;
   name: string;
   description: string;
+  terminal: string;
   images: string[];
   amenities: string[];
   openingHours: {
@@ -103,6 +104,7 @@ export const lounges: Lounge[] = [
     airportId: "1",
     name: "Skyline Lounge",
     description: "Experience the height of luxury with panoramic views of the runway, premium dining options, and relaxing spa amenities.",
+    terminal: "Terminal 5",
     images: [
       "https://images.unsplash.com/photo-1571770095004-6b61b1cf308a?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
       "https://images.unsplash.com/photo-1628151015968-3a4429e9ef04?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
@@ -122,6 +124,7 @@ export const lounges: Lounge[] = [
     airportId: "1",
     name: "Elite Terminal Lounge",
     description: "A quiet sanctuary away from the crowds, offering a sophisticated setting with high-end amenities and personalized service.",
+    terminal: "Terminal 2",
     images: [
       "https://images.unsplash.com/photo-1516705486326-924d0ad615ac?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
       "https://images.unsplash.com/photo-1631049035182-249067d7618e?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
@@ -141,6 +144,7 @@ export const lounges: Lounge[] = [
     airportId: "2",
     name: "Liberty Lounge",
     description: "New York's premier airport lounge featuring local cuisine, craft cocktails, and amenities designed for the discerning traveler.",
+    terminal: "Terminal 4",
     images: [
       "https://images.unsplash.com/photo-1585468274952-66591eb14165?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
       "https://images.unsplash.com/photo-1470053053191-49690aa5590e?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
@@ -160,6 +164,7 @@ export const lounges: Lounge[] = [
     airportId: "3",
     name: "Le Salon Parisien",
     description: "Embrace Parisian elegance in this sophisticated lounge offering French cuisine, fine wines, and a refined atmosphere.",
+    terminal: "Terminal 2E",
     images: [
       "https://images.unsplash.com/photo-1634704784915-aacf363b021f?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
       "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
@@ -179,6 +184,7 @@ export const lounges: Lounge[] = [
     airportId: "5",
     name: "Garden Terrace Lounge",
     description: "An oasis of tranquility featuring indoor gardens, water features, and a blend of Eastern and Western hospitality.",
+    terminal: "Terminal 3",
     images: [
       "https://images.unsplash.com/photo-1604933834372-3679a3f70f06?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
       "https://images.unsplash.com/photo-1576502200916-3808e07386a5?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",

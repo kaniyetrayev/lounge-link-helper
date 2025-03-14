@@ -1,6 +1,7 @@
 
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
+import { MapPin } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BookingForm from "@/components/BookingForm";
 import { getLoungeById } from "@/lib/data";
@@ -28,6 +29,7 @@ const Booking = () => {
     const bookingDetails = {
       loungeId: lounge.id,
       loungeName: lounge.name,
+      terminal: lounge.terminal,
       guests: data.guests,
       pricePerGuest: lounge.price,
       totalPrice: lounge.price * data.guests,
@@ -54,6 +56,10 @@ const Booking = () => {
           <div className="flex items-start">
             <div className="flex-1">
               <h2 className="font-semibold">{lounge.name}</h2>
+              <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 mr-1" /> 
+                <span>{lounge.terminal}</span>
+              </div>
             </div>
           </div>
         </div>

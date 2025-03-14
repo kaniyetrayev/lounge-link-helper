@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Clock, Star, ChevronRight } from "lucide-react";
+import { Clock, Star, ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { getAirportById, getLoungesByAirportId, formatCurrency } from "@/lib/data";
@@ -64,6 +64,10 @@ const LoungeDetails = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{lounge.name}</h3>
+                      <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5 mr-1" /> 
+                        <span>{lounge.terminal}</span>
+                      </div>
                       <div className="flex items-center mt-1 text-sm text-muted-foreground">
                         <Star className="h-3.5 w-3.5 text-amber-500 mr-1" /> 
                         <span>{lounge.rating}</span>
