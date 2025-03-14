@@ -21,8 +21,6 @@ import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   guests: z.number(),
-  date: z.date(),
-  time: z.string(),
 });
 
 type BookingFormData = z.infer<typeof formSchema>;
@@ -115,27 +113,12 @@ const Booking = ({ onClose }: BookingProps) => {
       return;
     }
     
-    if (!data.date) {
-      toast.error("Please select a date");
-      return;
-    }
-    
-    // Format date for display
-    const formattedDate = data.date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric'
-    });
-    
     // Store the booking details in session storage
     const bookingDetails = {
       loungeId: lounge.id,
       loungeName: lounge.name,
       terminal: lounge.terminal,
       guests: data.guests,
-      date: data.date.toISOString(),
-      formattedDate,
-      time: data.time,
       pricePerGuest: lounge.price,
       totalPrice: lounge.price * data.guests,
       currency: lounge.currency,

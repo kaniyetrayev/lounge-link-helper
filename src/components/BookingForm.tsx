@@ -2,8 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { format } from "date-fns";
-import { Plus, Minus, Calendar, Clock } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,20 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Lounge, formatCurrency } from "@/lib/data";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formSchema = z.object({
   guests: z.number().min(1).max(10),
-  date: z.date({
-    required_error: "Please select a date",
-  }),
-  time: z.string({
-    required_error: "Please select a time",
-  }),
 });
 
 interface BookingFormProps {
@@ -37,27 +25,10 @@ interface BookingFormProps {
 }
 
 const BookingForm = ({ lounge, onSubmit }: BookingFormProps) => {
-  const today = new Date();
-  
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 8; hour <= 22; hour++) {
-      slots.push(`${hour}:00`);
-      if (hour < 22) {
-        slots.push(`${hour}:30`);
-      }
-    }
-    return slots;
-  };
-
-  const timeSlots = generateTimeSlots();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       guests: 1,
-      date: today,
-      time: "12:00",
     },
   });
 
@@ -123,75 +94,6 @@ const BookingForm = ({ lounge, onSubmit }: BookingFormProps) => {
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal h-12",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < today}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger className="h-12">
-                    <SelectValue placeholder="Select a time" />
-                    <Clock className="h-4 w-4 opacity-50" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}
