@@ -1,6 +1,7 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface OnboardingSlideProps {
   title: string;
@@ -18,11 +19,18 @@ const OnboardingSlide = ({
   children
 }: OnboardingSlideProps) => {
   return (
-    <div 
+    <motion.div 
       className={cn(
-        "absolute inset-0 flex flex-col items-center px-6 pb-24 pt-16 transition-opacity duration-500",
-        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+        "absolute inset-0 flex flex-col items-center px-6 pb-24 pt-16",
+        isActive ? "z-10" : "z-0 pointer-events-none"
       )}
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ 
+        opacity: isActive ? 1 : 0,
+        x: isActive ? 0 : 100,
+        transition: { duration: 0.3 }
+      }}
+      exit={{ opacity: 0, x: -100 }}
     >
       <div className="h-[45vh] w-full relative mb-8 overflow-hidden rounded-2xl">
         <img 
@@ -39,7 +47,7 @@ const OnboardingSlide = ({
         <p className="text-muted-foreground mb-8">{description}</p>
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
