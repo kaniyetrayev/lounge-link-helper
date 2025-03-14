@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, Calendar, Clock, Users } from "lucide-react";
+import { Check, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import QRCode from "@/components/QRCode";
@@ -59,26 +59,9 @@ const Confirmation = () => {
         <div className="bg-white rounded-2xl border shadow-sm overflow-hidden mb-8">
           <div className="p-6 text-center border-b">
             <h2 className="font-semibold text-lg mb-2">{booking.loungeName}</h2>
+            <p className="text-sm text-muted-foreground">{booking.terminal}</p>
             
-            <div className="flex justify-center space-x-6 mt-4">
-              <div className="flex flex-col items-center">
-                <div className="p-2 rounded-full bg-accent mb-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {booking.formattedDate}
-                </span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div className="p-2 rounded-full bg-accent mb-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {booking.time}
-                </span>
-              </div>
-              
+            <div className="flex justify-center mt-4">
               <div className="flex flex-col items-center">
                 <div className="p-2 rounded-full bg-accent mb-2">
                   <Users className="h-5 w-5 text-primary" />
