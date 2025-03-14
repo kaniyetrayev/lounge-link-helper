@@ -31,28 +31,50 @@ const LoungeDetails = () => {
     const fetchLounges = async () => {
       try {
         setLoading(true);
+        console.log("Searching lounges for:", airport);
         
-        // Try to search by airport name first
-        const apiLounges = await api.searchLounges({
+        // First try to search by city (most reliable)
+        console.log("Searching by city:", airport.city);
+        const cityLounges = await api.searchLounges({
+          city: airport.city
+        });
+        
+        // If city search has results, use them
+        if (cityLounges && cityLounges.length > 0) {
+          console.log("Found lounges by city:", cityLounges.length);
+          setLounges(adaptLounges(cityLounges));
+          setLoading(false);
+          return;
+        }
+        
+        // If no results, try by airport name
+        console.log("City search returned no results, trying airport name:", airport.name);
+        const airportLounges = await api.searchLounges({
           airport_name: airport.name
         });
         
-        // If no results, try search by city
-        if (apiLounges.length === 0) {
-          const cityLounges = await api.searchLounges({
-            city: airport.city
-          });
-          
-          if (cityLounges.length === 0) {
-            // If still no results, get all lounges as fallback
-            const allLounges = await api.getAllLounges();
-            const adaptedLounges = adaptLounges(allLounges.slice(0, 5)); // Limit results
-            setLounges(adaptedLounges);
-          } else {
-            setLounges(adaptLounges(cityLounges));
-          }
+        if (airportLounges && airportLounges.length > 0) {
+          console.log("Found lounges by airport name:", airportLounges.length);
+          setLounges(adaptLounges(airportLounges));
+          setLoading(false);
+          return;
+        }
+        
+        // If still no results, try by country as a fallback
+        console.log("Airport name search returned no results, trying country:", airport.country);
+        const countryLounges = await api.searchLounges({
+          country: airport.country
+        });
+        
+        if (countryLounges && countryLounges.length > 0) {
+          console.log("Found lounges by country:", countryLounges.length);
+          setLounges(adaptLounges(countryLounges));
         } else {
-          setLounges(adaptLounges(apiLounges));
+          // Last resort - get all lounges and limit results
+          console.log("No specific lounges found, getting all lounges as fallback");
+          const allLounges = await api.getAllLounges();
+          console.log("Got all lounges:", allLounges?.length);
+          setLounges(adaptLounges(allLounges?.slice(0, 5) || []));
         }
         
         setError(null);
