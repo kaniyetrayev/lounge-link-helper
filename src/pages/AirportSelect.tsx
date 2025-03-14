@@ -16,6 +16,7 @@ const AirportSelect = () => {
   const popularAirports = airports.slice(0, 5);
 
   const handleAirportSelect = (airport: Airport) => {
+    // Navigate to the lounges page for the selected airport
     navigate(`/lounges/${airport.id}`);
   };
 

@@ -46,10 +46,10 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
   }, []);
 
   const handleSelect = (airport: Airport) => {
-    onSelect(airport);
     setQuery("");
-    setIsFocused(false);
     setResults([]);
+    setIsFocused(false);
+    onSelect(airport);
   };
 
   const clearSearch = () => {

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OnboardingSlide from "@/components/OnboardingSlide";
-import { motion, AnimatePresence } from "framer-motion";
 
 const Onboarding = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
