@@ -108,8 +108,15 @@ const Booking = ({ onClose }: BookingProps) => {
   }, [loungeId, navigate]);
   
   const handleSubmit = (data: BookingFormData) => {
+    console.log("Booking - Form submitted:", data);
+    
     if (!lounge) {
       toast.error("Lounge information not available");
+      return;
+    }
+    
+    if (!data.date) {
+      toast.error("Please select a date");
       return;
     }
     
