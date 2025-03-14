@@ -41,8 +41,11 @@ const AirportSelect = () => {
     const fetchAirports = async () => {
       try {
         setLoading(true);
+        console.log("AirportSelect - Fetching airports");
         const response = await api.getAirports(true);
+        console.log("AirportSelect - Airports response:", response);
         const adaptedAirports = adaptAirports(response.airports);
+        console.log("AirportSelect - Adapted airports:", adaptedAirports.length);
         setAirports(adaptedAirports);
         setError(null);
       } catch (err) {
@@ -61,6 +64,8 @@ const AirportSelect = () => {
 
   const handleAirportSelect = (airport: Airport) => {
     // Navigate to the lounges page for the selected airport
+    console.log("AirportSelect - Airport selected, navigating to:", `/lounges/${airport.id}`);
+    console.log("AirportSelect - Airport data:", airport);
     navigate(`/lounges/${airport.id}`);
   };
 

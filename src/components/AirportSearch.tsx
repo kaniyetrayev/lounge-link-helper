@@ -26,8 +26,12 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
     queryKey: ['airports'],
     queryFn: async () => {
       try {
+        console.log("Fetching airports from API");
         const response = await api.getAirports(true);
-        return adaptAirports(response.airports);
+        console.log("API airports response:", response);
+        const adapted = adaptAirports(response.airports);
+        console.log("Adapted airports:", adapted.length);
+        return adapted;
       } catch (err) {
         // If API fails, fall back to local data
         console.error("Failed to fetch airports, using local data:", err);
@@ -71,6 +75,7 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
   }, []);
 
   const handleSelect = (airport: Airport) => {
+    console.log("Airport selected:", airport);
     setQuery("");
     setResults([]);
     setIsFocused(false);

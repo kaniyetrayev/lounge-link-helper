@@ -22,8 +22,13 @@ const LoungeDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Debug log to verify airport data
+  console.log("LoungeDetails - airportId:", airportId);
+  console.log("LoungeDetails - airport data:", airport);
+  
   useEffect(() => {
     if (!airport) {
+      console.log("No airport data found, redirecting to airport-select");
       navigate("/airport-select");
       return;
     }
@@ -31,24 +36,26 @@ const LoungeDetails = () => {
     const fetchLounges = async () => {
       try {
         setLoading(true);
-        console.log("Searching lounges for:", airport);
+        console.log("Starting lounge search for airport:", airport);
         
         // First try to search by city (most reliable)
-        console.log("Searching by city:", airport.city);
-        const cityLounges = await api.searchLounges({
-          city: airport.city
-        });
+        console.log("Attempting to search lounges by city:", airport.city);
+        const cityParams = { city: airport.city };
+        console.log("API request params:", cityParams);
+        
+        const cityLounges = await api.searchLounges(cityParams);
+        console.log("API response for city search:", cityLounges);
         
         // If city search has results, use them
         if (cityLounges && cityLounges.length > 0) {
-          console.log("Found lounges by city:", cityLounges.length);
+          console.log("Found lounges by city search:", cityLounges.length);
           setLounges(adaptLounges(cityLounges));
           setLoading(false);
           return;
         }
         
         // If no results, try by airport name
-        console.log("City search returned no results, trying airport name:", airport.name);
+        console.log("No results from city search, trying airport name:", airport.name);
         const airportLounges = await api.searchLounges({
           airport_name: airport.name
         });
@@ -61,7 +68,7 @@ const LoungeDetails = () => {
         }
         
         // If still no results, try by country as a fallback
-        console.log("Airport name search returned no results, trying country:", airport.country);
+        console.log("No results from airport name search, trying country:", airport.country);
         const countryLounges = await api.searchLounges({
           country: airport.country
         });
@@ -89,6 +96,7 @@ const LoungeDetails = () => {
       }
     };
     
+    console.log("Calling fetchLounges function");
     fetchLounges();
   }, [airport, navigate]);
   
