@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import { getAirportById, formatCurrency } from "@/lib/data";
 import { api } from "@/lib/api";
 import { adaptLounges } from "@/lib/apiAdapter";
-import { Lounge } from "@/lib/data";
+import { Lounge, Airport } from "@/lib/data";
 import { toast } from "sonner";
 import LoungeCard from "@/components/LoungeCard";
 
@@ -15,72 +15,90 @@ const LoungeDetails = () => {
   const { airportId } = useParams();
   const navigate = useNavigate();
   
-  // Get airport data
-  const airport = airportId ? getAirportById(airportId) : null;
+  // Try to get airport from both URL param and session storage
+  const airportFromData = airportId ? getAirportById(airportId) : null;
+  const [airport, setAirport] = useState<Airport | null>(airportFromData);
   
   const [lounges, setLounges] = useState<Lounge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Debug log to verify airport data
-  console.log("LoungeDetails - airportId:", airportId);
-  console.log("LoungeDetails - airport data:", airport);
-  
+  // Try to get airport from session storage if not found by ID
   useEffect(() => {
     if (!airport) {
-      console.log("No airport data found, redirecting to airport-select");
-      navigate("/airport-select");
-      return;
+      console.log("Airport not found by ID, checking session storage");
+      const storedAirport = sessionStorage.getItem("selectedAirport");
+      
+      if (storedAirport) {
+        try {
+          const parsedAirport = JSON.parse(storedAirport);
+          console.log("Found airport in session storage:", parsedAirport);
+          setAirport(parsedAirport);
+        } catch (err) {
+          console.error("Error parsing stored airport:", err);
+          navigate("/airport-select");
+        }
+      } else {
+        console.log("No airport found in session storage, redirecting");
+        navigate("/airport-select");
+      }
     }
+  }, [airport, navigate]);
+  
+  // Fetch lounges when airport is available
+  useEffect(() => {
+    if (!airport) return;
     
     const fetchLounges = async () => {
       try {
         setLoading(true);
-        console.log("Starting lounge search for airport:", airport);
+        console.log("FETCH LOUNGES - Starting search for airport:", airport);
         
         // First try to search by city (most reliable)
-        console.log("Attempting to search lounges by city:", airport.city);
+        console.log("FETCH LOUNGES - Searching by city:", airport.city);
         const cityParams = { city: airport.city };
-        console.log("API request params:", cityParams);
+        console.log("FETCH LOUNGES - API request params:", cityParams);
         
         const cityLounges = await api.searchLounges(cityParams);
-        console.log("API response for city search:", cityLounges);
+        console.log("FETCH LOUNGES - API response for city search:", cityLounges);
         
         // If city search has results, use them
         if (cityLounges && cityLounges.length > 0) {
-          console.log("Found lounges by city search:", cityLounges.length);
+          console.log("FETCH LOUNGES - Found lounges by city search:", cityLounges.length);
           setLounges(adaptLounges(cityLounges));
           setLoading(false);
           return;
         }
         
         // If no results, try by airport name
-        console.log("No results from city search, trying airport name:", airport.name);
+        console.log("FETCH LOUNGES - No results from city search, trying airport name:", airport.name);
         const airportLounges = await api.searchLounges({
           airport_name: airport.name
         });
+        console.log("FETCH LOUNGES - Airport name search results:", airportLounges);
         
         if (airportLounges && airportLounges.length > 0) {
-          console.log("Found lounges by airport name:", airportLounges.length);
+          console.log("FETCH LOUNGES - Found lounges by airport name:", airportLounges.length);
           setLounges(adaptLounges(airportLounges));
           setLoading(false);
           return;
         }
         
         // If still no results, try by country as a fallback
-        console.log("No results from airport name search, trying country:", airport.country);
+        console.log("FETCH LOUNGES - No results from airport name search, trying country:", airport.country);
         const countryLounges = await api.searchLounges({
           country: airport.country
         });
+        console.log("FETCH LOUNGES - Country search results:", countryLounges);
         
         if (countryLounges && countryLounges.length > 0) {
-          console.log("Found lounges by country:", countryLounges.length);
+          console.log("FETCH LOUNGES - Found lounges by country:", countryLounges.length);
           setLounges(adaptLounges(countryLounges));
         } else {
           // Last resort - get all lounges and limit results
-          console.log("No specific lounges found, getting all lounges as fallback");
+          console.log("FETCH LOUNGES - No specific lounges found, getting all lounges as fallback");
           const allLounges = await api.getAllLounges();
-          console.log("Got all lounges:", allLounges?.length);
+          console.log("FETCH LOUNGES - Got all lounges:", allLounges?.length);
           setLounges(adaptLounges(allLounges?.slice(0, 5) || []));
         }
         
@@ -98,10 +116,16 @@ const LoungeDetails = () => {
     
     console.log("Calling fetchLounges function");
     fetchLounges();
-  }, [airport, navigate]);
+  }, [airport]);
   
   if (!airport) {
-    return null;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading airport information...</p>
+        </div>
+      </div>
+    );
   }
 
   const handleLoungeSelect = (loungeId: string) => {

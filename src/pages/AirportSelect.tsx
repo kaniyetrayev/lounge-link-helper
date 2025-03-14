@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Ticket } from "lucide-react";
@@ -63,9 +62,14 @@ const AirportSelect = () => {
   }, []);
 
   const handleAirportSelect = (airport: Airport) => {
+    // Store selected airport in session storage to ensure it's available in LoungeDetails
+    sessionStorage.setItem("selectedAirport", JSON.stringify(airport));
+    
+    // Log for debugging
+    console.log("AirportSelect - Airport selected:", airport);
+    console.log("AirportSelect - Navigating to:", `/lounges/${airport.id}`);
+    
     // Navigate to the lounges page for the selected airport
-    console.log("AirportSelect - Airport selected, navigating to:", `/lounges/${airport.id}`);
-    console.log("AirportSelect - Airport data:", airport);
     navigate(`/lounges/${airport.id}`);
   };
 

@@ -26,11 +26,11 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
     queryKey: ['airports'],
     queryFn: async () => {
       try {
-        console.log("Fetching airports from API");
+        console.log("AirportSearch - Fetching airports from API");
         const response = await api.getAirports(true);
-        console.log("API airports response:", response);
+        console.log("AirportSearch - API airports response received");
         const adapted = adaptAirports(response.airports);
-        console.log("Adapted airports:", adapted.length);
+        console.log("AirportSearch - Adapted airports count:", adapted.length);
         return adapted;
       } catch (err) {
         // If API fails, fall back to local data
@@ -75,7 +75,11 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
   }, []);
 
   const handleSelect = (airport: Airport) => {
-    console.log("Airport selected:", airport);
+    console.log("AirportSearch - Airport selected:", airport);
+    
+    // Store the selected airport in session storage as a backup
+    sessionStorage.setItem("selectedAirport", JSON.stringify(airport));
+    
     setQuery("");
     setResults([]);
     setIsFocused(false);
