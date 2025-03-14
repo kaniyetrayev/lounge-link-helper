@@ -179,10 +179,10 @@ const Booking = () => {
         <div className="p-5 rounded-xl bg-white border shadow-sm mb-6">
           <div className="flex items-start">
             <div className="flex-1">
-              <h2 className="font-semibold">{lounge.name}</h2>
+              <h2 className="font-semibold">{lounge?.name}</h2>
               <div className="flex items-center mt-1 text-sm text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 mr-1" /> 
-                <span>{lounge.terminal}</span>
+                <span>{lounge?.terminal}</span>
               </div>
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerFooter,
+  DrawerDescription,
 } from "@/components/ui/drawer";
 
 interface CheckoutProps {
@@ -56,10 +57,21 @@ const Checkout = ({ onClose }: CheckoutProps) => {
           bookingId: `LNG-${Math.floor(Math.random() * 10000)}`,
           status: "confirmed"
         }));
+        
+        // Also store as completedBooking for the confirmation page
+        sessionStorage.setItem("completedBooking", JSON.stringify({
+          ...bookingDetails,
+          bookingId: `LNG-${Math.floor(Math.random() * 10000)}`,
+          status: "confirmed",
+          firstName: "John", // Adding dummy data for the confirmation
+          lastName: "Doe",
+          email: "john.doe@example.com",
+          phone: "+1 123-456-7890"
+        }));
       }
       
       // Navigate to confirmation page
-      navigate("/confirmation");
+      navigate("/confirmation", { state: { fromCheckout: true } });
     } catch (err) {
       console.error("Checkout failed:", err);
       toast.error("Checkout failed, please try again");
@@ -79,7 +91,10 @@ const Checkout = ({ onClose }: CheckoutProps) => {
   }
   
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer open={isOpen} onOpenChange={(open) => {
+      setIsOpen(open);
+      if (!open) handleClose();
+    }}>
       <DrawerContent>
         <div className="max-w-md mx-auto">
           <DrawerHeader className="border-b">
@@ -94,6 +109,9 @@ const Checkout = ({ onClose }: CheckoutProps) => {
                 <X className="h-4 w-4" />
               </Button>
             </DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Complete your booking
+            </DrawerDescription>
           </DrawerHeader>
           
           <div className="px-4 py-6">

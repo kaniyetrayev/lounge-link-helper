@@ -1,8 +1,9 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
@@ -19,6 +20,7 @@ const queryClient = new QueryClient();
 // Wrapper component to manage checkout visibility
 const AppRoutes = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showCheckout, setShowCheckout] = useState(false);
   const [prevLocation, setPrevLocation] = useState(location);
 
@@ -33,6 +35,12 @@ const AppRoutes = () => {
   useEffect(() => {
     setShowCheckout(location.pathname.includes('/checkout'));
   }, [location]);
+
+  const handleCloseCheckout = () => {
+    setShowCheckout(false);
+    // Use navigate instead of window.history.back() for better React Router integration
+    navigate(-1);
+  };
 
   // This is the location we'll render in the main Routes
   // When in checkout, we still want to render the previous location underneath
@@ -51,10 +59,9 @@ const AppRoutes = () => {
       </Routes>
       
       {/* Show checkout as an overlay when on the /checkout route */}
-      {showCheckout && <Checkout onClose={() => {
-        // Use window.history to go back without triggering a full reload
-        window.history.back();
-      }} />}
+      {showCheckout && (
+        <Checkout onClose={handleCloseCheckout} />
+      )}
     </>
   );
 };
