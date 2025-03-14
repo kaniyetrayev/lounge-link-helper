@@ -11,7 +11,7 @@ import {
   FlightSearchResponse
 } from './api-types';
 
-const API_BASE_URL = 'https://9b5e25560dad.ngrok.app/api';
+const API_BASE_URL = 'https://appboxo.ngrok.io/api';
 
 // Helper for common fetch options
 const createFetchOptions = (method: string, body?: any) => {
