@@ -19,7 +19,7 @@ interface CheckoutProps {
 
 const Checkout = ({ onClose }: CheckoutProps) => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   
   useEffect(() => {
@@ -31,37 +31,32 @@ const Checkout = ({ onClose }: CheckoutProps) => {
       } else {
         toast.error("No booking details found");
         // Close the drawer if no booking details
-        onClose();
+        handleClose();
       }
     } catch (err) {
       console.error("Failed to parse booking details:", err);
       toast.error("Failed to load booking details");
-      onClose();
+      handleClose();
     }
-    
-    // Open the drawer with a slight delay for animation
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  }, []);
   
   const handleCheckout = () => {
     // Process the checkout (in a real app, this would handle payment)
     try {
       // Store confirmation details for the confirmation page
       if (bookingDetails) {
+        const bookingId = `LNG-${Math.floor(Math.random() * 10000)}`;
+        
         sessionStorage.setItem("confirmationDetails", JSON.stringify({
           ...bookingDetails,
-          bookingId: `LNG-${Math.floor(Math.random() * 10000)}`,
+          bookingId,
           status: "confirmed"
         }));
         
         // Also store as completedBooking for the confirmation page
         sessionStorage.setItem("completedBooking", JSON.stringify({
           ...bookingDetails,
-          bookingId: `LNG-${Math.floor(Math.random() * 10000)}`,
+          bookingId,
           status: "confirmed",
           firstName: "John", // Adding dummy data for the confirmation
           lastName: "Doe",
@@ -70,8 +65,13 @@ const Checkout = ({ onClose }: CheckoutProps) => {
         }));
       }
       
-      // Navigate to confirmation page
-      navigate("/confirmation", { state: { fromCheckout: true } });
+      // Close drawer first to avoid animation issues
+      setIsOpen(false);
+      
+      // Then navigate to confirmation page after a short delay
+      setTimeout(() => {
+        navigate("/confirmation", { state: { fromCheckout: true } });
+      }, 300);
     } catch (err) {
       console.error("Checkout failed:", err);
       toast.error("Checkout failed, please try again");
@@ -81,9 +81,7 @@ const Checkout = ({ onClose }: CheckoutProps) => {
   const handleClose = () => {
     setIsOpen(false);
     // Add a slight delay to allow drawer close animation
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    setTimeout(onClose, 300);
   };
   
   if (!bookingDetails) {
@@ -91,10 +89,12 @@ const Checkout = ({ onClose }: CheckoutProps) => {
   }
   
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (!open) handleClose();
-    }}>
+    <Drawer 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
       <DrawerContent>
         <div className="max-w-md mx-auto">
           <DrawerHeader className="border-b">

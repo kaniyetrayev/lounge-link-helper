@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,7 +37,7 @@ const AppRoutes = () => {
 
   const handleCloseCheckout = () => {
     setShowCheckout(false);
-    // Use navigate instead of window.history.back() for better React Router integration
+    // Navigate back to previous page
     navigate(-1);
   };
 
@@ -60,7 +59,9 @@ const AppRoutes = () => {
       
       {/* Show checkout as an overlay when on the /checkout route */}
       {showCheckout && (
-        <Checkout onClose={handleCloseCheckout} />
+        <Routes>
+          <Route path="/checkout" element={<Checkout onClose={handleCloseCheckout} />} />
+        </Routes>
       )}
     </>
   );
