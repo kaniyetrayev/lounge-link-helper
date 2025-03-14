@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Clock, Star, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import { getAirportById, getLoungesForAirport, formatCurrency } from "@/lib/data";
+import { getAirportById, getLoungesByAirportId, formatCurrency } from "@/lib/data";
 
 const LoungeDetails = () => {
   const { airportId } = useParams();
@@ -14,7 +13,7 @@ const LoungeDetails = () => {
   const airport = airportId ? getAirportById(airportId) : null;
   
   // Get lounges for the selected airport
-  const lounges = airportId ? getLoungesForAirport(airportId) : [];
+  const lounges = airportId ? getLoungesByAirportId(airportId) : [];
   
   useEffect(() => {
     if (!airport) {
