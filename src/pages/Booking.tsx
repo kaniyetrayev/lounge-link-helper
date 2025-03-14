@@ -6,8 +6,6 @@ import BookingForm from "@/components/BookingForm";
 import { getLoungeById } from "@/lib/data";
 
 const formSchema = z.object({
-  date: z.date(),
-  time: z.string(),
   guests: z.number(),
 });
 
@@ -30,13 +28,6 @@ const Booking = () => {
     const bookingDetails = {
       loungeId: lounge.id,
       loungeName: lounge.name,
-      date: data.date.toISOString(),
-      formattedDate: data.date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
-      }),
-      time: data.time,
       guests: data.guests,
       pricePerGuest: lounge.price,
       totalPrice: lounge.price * data.guests,
@@ -55,7 +46,7 @@ const Booking = () => {
         <div className="mb-6">
           <h1 className="page-heading">Booking Details</h1>
           <p className="text-muted-foreground">
-            Select your visit date and number of guests
+            Select number of guests
           </p>
         </div>
         
