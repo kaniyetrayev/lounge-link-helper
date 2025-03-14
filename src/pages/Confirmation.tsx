@@ -1,46 +1,127 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Check, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import QRCode from "@/components/QRCode";
 import { formatCurrency } from "@/lib/data";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Confirmation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [booking, setBooking] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Get completed booking details from session storage
-    const bookingStr = sessionStorage.getItem("completedBooking");
-    
-    if (bookingStr) {
-      const bookingData = JSON.parse(bookingStr);
-      setBooking(bookingData);
-      
-      // Only show toast when coming from checkout (has state.fromCheckout)
-      if (location.state?.fromCheckout) {
-        toast.success("Booking confirmed!", {
-          description: "Your lounge access has been successfully booked!"
-        });
+    const fetchBooking = async () => {
+      try {
+        // First try to get booking ID from URL params
+        let bookingId = searchParams.get('id') || location.state?.bookingId;
+        
+        // If no booking ID in URL, try session storage
+        if (!bookingId) {
+          const bookingStr = sessionStorage.getItem("completedBooking");
+          if (bookingStr) {
+            const storedBooking = JSON.parse(bookingStr);
+            setBooking(storedBooking);
+            setLoading(false);
+            // Only show toast when coming from checkout
+            if (location.state?.fromCheckout) {
+              toast.success("Booking confirmed!", {
+                description: "Your lounge access has been successfully booked!"
+              });
+            }
+            return;
+          }
+        } else {
+          // Fetch booking from Supabase using the booking ID
+          const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .eq('booking_id', bookingId)
+            .single();
+          
+          if (error) {
+            console.error("Error fetching booking:", error);
+            toast.error("Could not load booking details");
+            navigate("/airport-select");
+            return;
+          }
+          
+          if (data) {
+            // Transform database data to match the format expected by the component
+            const bookingData = {
+              bookingId: data.booking_id,
+              loungeName: data.lounge_name,
+              terminal: data.terminal,
+              guests: data.guests,
+              totalPrice: data.total_price,
+              currency: data.currency,
+              firstName: data.first_name,
+              lastName: data.last_name,
+              email: data.email,
+              phone: data.phone,
+              status: data.status
+            };
+            
+            setBooking(bookingData);
+            
+            // Show confirmation toast if coming directly from checkout
+            if (location.state?.fromCheckout) {
+              toast.success("Booking confirmed!", {
+                description: "Your lounge access has been successfully booked!"
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch booking:", err);
+        toast.error("Could not load booking details");
+      } finally {
+        setLoading(false);
       }
-    } else {
-      navigate("/airport-select");
-    }
-  }, [navigate, location.state]);
+    };
+    
+    fetchBooking();
+  }, [navigate, location.state, searchParams]);
   
-  if (!booking) {
-    return null;
-  }
-
   const handleFindMoreLounges = () => {
     // Redirect to airport selection without clearing completedBooking
     sessionStorage.removeItem("bookingDetails");
     navigate("/airport-select");
   };
+  
+  if (loading) {
+    return (
+      <div className="page-container bg-background">
+        <Navbar title="Loading Booking" />
+        <div className="flex items-center justify-center h-[80vh]">
+          <p className="text-muted-foreground">Loading booking details...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!booking) {
+    return (
+      <div className="page-container bg-background">
+        <Navbar title="Booking Not Found" />
+        <div className="flex flex-col items-center justify-center h-[60vh] px-4">
+          <h1 className="text-2xl font-semibold mb-4">Booking Not Found</h1>
+          <p className="text-muted-foreground text-center mb-8">
+            We couldn't find the booking you're looking for.
+          </p>
+          <Button onClick={() => navigate("/airport-select")}>
+            Find Lounges
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="page-container bg-background">
