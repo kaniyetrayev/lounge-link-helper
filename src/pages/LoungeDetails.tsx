@@ -38,7 +38,7 @@ const LoungeDetails = () => {
       />
       
       <div className="page-container">
-        <div className="page-content pt-4 pb-10 px-4">
+        <div className="page-content">
           <div className="mb-6">
             <h1 className="page-heading">Available Lounges</h1>
             <p className="text-muted-foreground">
