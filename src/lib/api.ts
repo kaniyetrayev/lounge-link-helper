@@ -1,3 +1,4 @@
+
 import { 
   AirportsResponse, 
   AirlinesResponse, 
@@ -19,6 +20,7 @@ const createFetchOptions = (method: string, body?: any) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   };
 
