@@ -128,8 +128,14 @@ const LoungeDetails = () => {
     );
   }
 
-  const handleLoungeSelect = (loungeId: string) => {
-    navigate(`/booking/${loungeId}`);
+  const handleLoungeSelect = (lounge: Lounge) => {
+    console.log("LoungeDetails - Lounge selected:", lounge.id, lounge.name);
+    
+    // Store the selected lounge in session storage for backup retrieval
+    sessionStorage.setItem("selectedLounge", JSON.stringify(lounge));
+    
+    // Navigate to the booking page with the lounge ID
+    navigate(`/booking/${lounge.id}`);
   };
 
   return (
@@ -178,7 +184,7 @@ const LoungeDetails = () => {
                 <LoungeCard 
                   key={lounge.id}
                   lounge={lounge}
-                  onClick={() => handleLoungeSelect(lounge.id)}
+                  onClick={() => handleLoungeSelect(lounge)}
                 />
               ))}
             </div>

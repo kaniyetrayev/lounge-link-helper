@@ -11,11 +11,16 @@ interface LoungeCardProps {
 
 const LoungeCard = ({ lounge, onClick }: LoungeCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  
+  const handleClick = () => {
+    console.log("LoungeCard - Lounge selected:", lounge.id, lounge.name);
+    onClick();
+  };
 
   return (
     <div 
       className="w-full bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-200 active:scale-98 animate-slide-up"
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className="aspect-[16/9] relative overflow-hidden bg-muted">
         <div className={cn(
