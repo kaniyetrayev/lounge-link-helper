@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Airport, searchAirports } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { adaptAirports } from "@/lib/apiAdapter";
+import { useQuery } from "@tanstack/react-query";
 
 interface AirportSearchProps {
   onSelect: (airport: Airport) => void;
@@ -18,14 +21,36 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  // Fetch all airports on component mount
+  const { data: allAirports, isLoading, error } = useQuery({
+    queryKey: ['airports'],
+    queryFn: async () => {
+      try {
+        const response = await api.getAirports(true);
+        return adaptAirports(response.airports);
+      } catch (err) {
+        // If API fails, fall back to local data
+        console.error("Failed to fetch airports, using local data:", err);
+        return searchAirports("");
+      }
+    },
+    staleTime: 1000 * 60 * 15, // 15 minutes
+  });
+
   useEffect(() => {
-    if (query.length >= 2) {
-      const searchResults = searchAirports(query);
-      setResults(searchResults);
+    if (query.length >= 2 && allAirports) {
+      // Filter airports based on query
+      const filtered = allAirports.filter(airport => 
+        airport.name.toLowerCase().includes(query.toLowerCase()) ||
+        airport.code.toLowerCase().includes(query.toLowerCase()) ||
+        airport.city.toLowerCase().includes(query.toLowerCase()) ||
+        airport.country.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered.slice(0, 7)); // Limit to 7 results
     } else {
       setResults([]);
     }
-  }, [query]);
+  }, [query, allAirports]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -65,11 +90,12 @@ const AirportSearch = ({ onSelect, placeholder = "Search airports or cities" }: 
         <Input
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
+          placeholder={isLoading ? "Loading airports..." : placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           className="pl-10 pr-10 h-12"
+          disabled={isLoading}
         />
         {query && (
           <Button

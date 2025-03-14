@@ -5,15 +5,20 @@ import { MapPin, Ticket } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import AirportSearch from "@/components/AirportSearch";
-import { Airport, airports } from "@/lib/data";
+import { Airport } from "@/lib/data";
 import { fadeIn, slideUp, staggeredChildren } from "@/lib/animations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import { adaptAirports } from "@/lib/apiAdapter";
 
 const AirportSelect = () => {
   const navigate = useNavigate();
   const [unusedBooking, setUnusedBooking] = useState<any>(null);
+  const [airports, setAirports] = useState<Airport[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Popular cities to feature
   const popularAirports = airports.slice(0, 5);
@@ -31,6 +36,27 @@ const AirportSelect = () => {
         description: "Your lounge booking is ready to use",
       });
     }
+    
+    // Fetch airports from API
+    const fetchAirports = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getAirports(true);
+        const adaptedAirports = adaptAirports(response.airports);
+        setAirports(adaptedAirports);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch airports:", err);
+        setError("Failed to load airports. Please try again later.");
+        toast.error("Failed to load airports", {
+          description: "Please check your connection and try again."
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAirports();
   }, []);
 
   const handleAirportSelect = (airport: Airport) => {
@@ -84,34 +110,49 @@ const AirportSelect = () => {
         <div className="mt-6">
           <h2 className="text-lg font-medium mb-4">Popular Airports</h2>
           
-          <motion.div 
-            className="space-y-3"
-            variants={staggeredChildren}
-            initial="initial"
-            animate="animate"
-          >
-            {popularAirports.map((airport, index) => (
-              <motion.button
-                key={airport.id}
-                className="w-full flex items-start space-x-3 p-4 bg-white rounded-xl shadow-sm border transition hover:shadow-md active:bg-accent/50"
-                onClick={() => handleAirportSelect(airport)}
-                variants={slideUp(index * 0.05)}
-              >
-                <MapPin className="h-5 w-5 mt-0.5 text-primary" />
-                <div className="text-left">
-                  <div className="flex items-center">
-                    <span className="font-medium">{airport.city}</span>
-                    <span className="ml-2 text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded">
-                      {airport.code}
-                    </span>
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div 
+                  key={i}
+                  className="w-full h-24 bg-accent/50 animate-pulse rounded-xl"
+                />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="p-4 border rounded-lg bg-destructive/10 text-destructive">
+              {error}
+            </div>
+          ) : (
+            <motion.div 
+              className="space-y-3"
+              variants={staggeredChildren}
+              initial="initial"
+              animate="animate"
+            >
+              {popularAirports.map((airport, index) => (
+                <motion.button
+                  key={airport.id}
+                  className="w-full flex items-start space-x-3 p-4 bg-white rounded-xl shadow-sm border transition hover:shadow-md active:bg-accent/50"
+                  onClick={() => handleAirportSelect(airport)}
+                  variants={slideUp(index * 0.05)}
+                >
+                  <MapPin className="h-5 w-5 mt-0.5 text-primary" />
+                  <div className="text-left">
+                    <div className="flex items-center">
+                      <span className="font-medium">{airport.city}</span>
+                      <span className="ml-2 text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded">
+                        {airport.code}
+                      </span>
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-0.5">
+                      {airport.name}
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-0.5">
-                    {airport.name}
-                  </div>
-                </div>
-              </motion.button>
-            ))}
-          </motion.div>
+                </motion.button>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
