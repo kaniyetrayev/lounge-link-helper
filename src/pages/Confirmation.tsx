@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Check, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 const Confirmation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [booking, setBooking] = useState<any>(null);
   
   useEffect(() => {
@@ -20,17 +21,16 @@ const Confirmation = () => {
       const bookingData = JSON.parse(bookingStr);
       setBooking(bookingData);
       
-      // Store in session storage for future reference
-      sessionStorage.setItem("completedBooking", JSON.stringify(bookingData));
-      
-      // Show success toast
-      toast.success("Booking confirmed!", {
-        description: "Your lounge access has been successfully booked!"
-      });
+      // Only show toast when coming from checkout (has state.fromCheckout)
+      if (location.state?.fromCheckout) {
+        toast.success("Booking confirmed!", {
+          description: "Your lounge access has been successfully booked!"
+        });
+      }
     } else {
       navigate("/airport-select");
     }
-  }, [navigate]);
+  }, [navigate, location.state]);
   
   if (!booking) {
     return null;

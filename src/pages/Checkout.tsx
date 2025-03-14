@@ -1,14 +1,11 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { format } from "date-fns";
-import { CreditCard, Calendar } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -19,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import Navbar from "@/components/Navbar";
 import { generateBookingId, formatCurrency } from "@/lib/data";
-import { toast } from "sonner";
 
 // Form schema for checkout
 const formSchema = z.object({
@@ -85,7 +81,9 @@ const Checkout = () => {
       sessionStorage.setItem("completedBooking", JSON.stringify(completeBooking));
       
       setIsProcessing(false);
-      navigate("/confirmation");
+      
+      // Navigate to confirmation with state indicating we came from checkout
+      navigate("/confirmation", { state: { fromCheckout: true } });
     }, 1500);
   };
   
