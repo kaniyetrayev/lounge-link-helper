@@ -30,10 +30,10 @@ const App = () => {
               <Route path="/airport-select" element={<AirportSelect />} />
               <Route path="/lounges/:airportId" element={<LoungeDetails />} />
               <Route path="/booking/:loungeId" element={<Booking />} />
-              <Route path="/checkout" element={<Checkout />} />
               <Route path="/confirmation" element={<Confirmation />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Checkout />
           </BrowserRouter>
         </MotionConfig>
       </TooltipProvider>

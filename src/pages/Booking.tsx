@@ -13,6 +13,8 @@ import { Lounge } from "@/lib/data";
 
 const formSchema = z.object({
   guests: z.number(),
+  date: z.date(),
+  time: z.string(),
 });
 
 type BookingFormData = z.infer<typeof formSchema>;
@@ -98,12 +100,22 @@ const Booking = () => {
       return;
     }
     
+    // Format date for display
+    const formattedDate = data.date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short', 
+      day: 'numeric'
+    });
+    
     // Store the booking details in session storage
     const bookingDetails = {
       loungeId: lounge.id,
       loungeName: lounge.name,
       terminal: lounge.terminal,
       guests: data.guests,
+      date: data.date.toISOString(),
+      formattedDate,
+      time: data.time,
       pricePerGuest: lounge.price,
       totalPrice: lounge.price * data.guests,
       currency: lounge.currency,
@@ -111,6 +123,8 @@ const Booking = () => {
     
     console.log("Booking - Saving booking details:", bookingDetails);
     sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+    
+    // Navigate to the checkout page as an overlay
     navigate("/checkout");
   };
 
